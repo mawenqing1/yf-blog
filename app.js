@@ -1,34 +1,64 @@
-const querystring = require('querystring')
-const handleBlogRouter = require('./src/router/blog');
-const handleUserRouter = require('./src/router/user');
+const querystring = require("querystring");
+const handleBlogRouter = require("./src/router/blog");
+const handleUserRouter = require("./src/router/user");
 
-const serverHandle = (req,res) => {
-    res.setHeader('Content-type', 'application/json');
+const getPostData = (req) => {
+    const promise = new Promise((resolve, reject) => {
+        if (req.method !== "POST") {
+            resolve({});
+            return;
+        }
+        if (req.headers["content-type"] !== "application/json") {
+            resolve({});
+            return;
+        }
+        let postData = "";
+        req.on("data", (chunk) => {
+            postData += chunk.toString();
+        });
+        req.on("end", () => {
+            if (!postData) {
+                resolve({});
+                return;
+            }
+            resolve(JSON.parse(postData));
+        });
+    });
+    return promise;
+};
+
+const serverHandle = (req, res) => {
+    res.setHeader("content-type", "application/json");
 
     const url = req.url;
-    req.path = url.split('?')[0];
-    req.query = querystring.parse(url.split('?')[1])
+    req.path = url.split("?")[0];
+    req.query = querystring.parse(url.split("?")[1]);
 
-    //handle blog router
-    const blogData = handleBlogRouter(req, res);
-    if(blogData) {
-        res.end(JSON.stringify(blogData))
-        return
-    }
+    
+    getPostData(req).then((postData) => {
+        req.body = postData;
 
-    //handle user router
-    const userData = handleUserRouter(req, res);
-    if(userData) {
-        res.end(JSON.stringify(userData))
-        return
-    }
+        //handle blog router
+        const blogData = handleBlogRouter(req, res);
+        if (blogData) {
+            res.end(JSON.stringify(blogData));
+            return;
+        }
 
-    //not found router  return 404
-    res.writeHead(404, 'Content-type', 'text/plain');
-    res.write('404 Not Found');
-    res.end();
-}
+        //handle user router
+        const userData = handleUserRouter(req, res);
+        if (userData) {
+            res.end(JSON.stringify(userData));
+            return;
+        }
 
-module.exports = serverHandle
+        //not found router  return 404
+        res.writeHead(404, "content-type", "text/plain");
+        res.write("404 Not Found");
+        res.end();
+    });
+};
+
+module.exports = serverHandle;
 
 // process.env.NODE_ENV
