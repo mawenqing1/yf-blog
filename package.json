@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/mawenqing1/yf-blog#readme",
   "dependencies": {
-    "lodash": "^4.17.21"
+    "mysql": "^2.18.1"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
