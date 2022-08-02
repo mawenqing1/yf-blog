@@ -46,16 +46,13 @@ const serverHandle = (req, res) => {
             })
             return
         }
-        // const blogData = handleBlogRouter(req, res);
-        // if (blogData) {
-        //     res.end(JSON.stringify(blogData));
-        //     return;
-        // }
 
         //handle user router
-        const userData = handleUserRouter(req, res);
-        if (userData) {
-            res.end(JSON.stringify(userData));
+        const userRes = handleUserRouter(req, res);
+        if (userRes) {
+            userRes.then(userData => {
+                res.end(JSON.stringify(userData));
+            })
             return;
         }
 
