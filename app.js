@@ -2,6 +2,7 @@ const querystring = require("querystring");
 const handleBlogRouter = require("./src/router/blog");
 const handleUserRouter = require("./src/router/user");
 
+//session data
 const SESSION_DATA = {};
 
 //get cookie expires time
